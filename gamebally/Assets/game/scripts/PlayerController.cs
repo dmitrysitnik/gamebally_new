@@ -9,11 +9,14 @@ public class PlayerController : MonoBehaviour
 {
     public Text countText;
     public Text winText;
-    public float speed;
-    public float upSpeed;
+    public static float speed = 7;
+    public static float upSpeed = 50;
+    private static bool isHaveSpeedUp = false;
+    private static bool isHavePickUp = false;
     private int count;
     private Rigidbody rb;
     public Text gameOver;
+    public static BoxCollider bx;
 
     void Start()
     {
@@ -23,16 +26,19 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         SetCountText();
         gameOver.text = "";
-
+        speed = 7;
+        isHaveSpeedUp = false;
+        isHavePickUp = false;
+        bx = GetComponent<BoxCollider>();
     }
     private void Update()
     {
         if (IsGameOver())
         {
-        if (Input.GetKeyDown(KeyCode.R))
-         {
-            SceneManager.LoadScene(SceneManager.GetSceneAt(0).name);
-         }
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                SceneManager.LoadScene(SceneManager.GetSceneAt(0).name);
+            }
 
         }
     }
@@ -46,6 +52,11 @@ public class PlayerController : MonoBehaviour
 
         rb.AddForce(movement * speed);
     }
+
+    /// <summary>
+    /// Взаимодействие с объектами
+    /// </summary>
+    /// <param name="other"></param>
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Pick Up"))
@@ -55,23 +66,30 @@ public class PlayerController : MonoBehaviour
             SetCountText();
         }
 
-        if (other.gameObject.CompareTag("Bonus"))
+        if (other.gameObject.CompareTag("bSpeedUp"))
         {
             other.gameObject.SetActive(false);
-            speed += upSpeed;
-            StartCoroutine(SpeedDown());
+            isHaveSpeedUp = true;
+
+        }
+
+        if (other.gameObject.CompareTag("bPickUp"))
+        {
+            other.gameObject.SetActive(false);
+            isHavePickUp = true;
         }
     }
+
     void SetCountText()
     {
         countText.text = "Count: " + count.ToString();
         if (count >= 12)
-        {
-            
+        {            
             winText.text = "You Win!";
             StartCoroutine(GameController.Win());          
         }
     }
+
     public static void RestartLevel()
     {
         // reload the scene
@@ -94,9 +112,38 @@ public class PlayerController : MonoBehaviour
         gameOver.text = "Game Over. Press 'R' to restart";
     }
 
-    IEnumerator SpeedDown()
+   public static IEnumerator SpeedDown()
     {
         yield return new WaitForSeconds(10.0f);
+        isHaveSpeedUp = false;
         speed -= upSpeed;
     }
+
+    public static void SpeedUp()
+    {
+        if(isHaveSpeedUp)
+        {
+            speed += upSpeed;
+        }
+    }
+
+    public static void PickUp()
+    {
+        if (isHavePickUp)
+        {
+            bx.size = new Vector3(5.0f, 5.0f, 5.0f);
+
+            //sc.radius = 0.5f;
+        }
+    }
+
+    public static IEnumerator ReturnState(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        isHavePickUp = false;
+        bx.size = new Vector3(0, 0, 0);
+    }
+
+
+
 }

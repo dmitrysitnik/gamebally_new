@@ -31,15 +31,15 @@ public class GameController : MonoBehaviour {
     Vector3 GetSpawnPosition()
     {
         bool isRight = false;
-        float randomAxiesX = Random.Range(-transform.localScale.x/2, transform.localScale.x/2);
-        float randomAxiesZ = Random.Range(-transform.localScale.z/2, transform.localScale.z/2);
+        float randomAxiesX = Random.Range(-transform.localScale.x, transform.localScale.x);
+        float randomAxiesZ = Random.Range(-transform.localScale.z, transform.localScale.z);
         while (!isRight)
         {
-           isRight =  Mathf.Pow(randomAxiesX, 2) + Mathf.Pow(randomAxiesZ, 2) <= transform.localScale.x * transform.localScale.x;
+           isRight =  (Mathf.Pow(randomAxiesX, 2) + Mathf.Pow(randomAxiesZ, 2)) <= Mathf.Pow(transform.localScale.x / 2, 2 );
             if (!isRight)
             {
-                randomAxiesX = Random.Range(-transform.localScale.x/2, transform.localScale.x/2);
-                randomAxiesZ = Random.Range(-transform.localScale.z/2, transform.localScale.z/2);
+                randomAxiesX = Random.Range(-transform.localScale.x, transform.localScale.x);
+                randomAxiesZ = Random.Range(-transform.localScale.z, transform.localScale.z);
             }
         }
         return new Vector3(randomAxiesX, 0.7f, randomAxiesZ );
@@ -72,9 +72,9 @@ public class GameController : MonoBehaviour {
 
     
 
-    GameObject PickUpItem ()
+   public GameObject PickUpItem ()
     {
-        GameObject item = items[Random.Range(0,4)];
+        GameObject item = items[Random.Range(0,items.Length)];
         return item;
     }
 
